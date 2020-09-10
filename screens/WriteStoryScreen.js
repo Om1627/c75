@@ -49,7 +49,7 @@ export default class WriteStoryScreen extends React.Component{
         marginTop:50,
         width:300,
         alignSelf:'center',
-        height:200,
+        height:225,
         textAlign:'center',
         borderWidth:4,
      
