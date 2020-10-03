@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View,Image,TextInput,TouchableOpacity,textb} from 'react-native';
+import { StyleSheet, Text, View,Image,TextInput,TouchableOpacity,ToastAndroid,KeyboardAvoidingView} from 'react-native';
 import {createAppContainer} from 'react-navigation'
 import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {Header} from 'react-native-elements'
+import db from '../config'
 
 export default class WriteStoryScreen extends React.Component{
     constructor(){
@@ -14,6 +15,38 @@ export default class WriteStoryScreen extends React.Component{
             Story:""
         }
     }
+    submitStory=()=>{
+      var storytitle=this.state.storyTitle
+      var authorname=this.state.authorName
+      var story=this.state.Story
+
+var Stories = db.collection('Stories')
+if(storytitle&&authorname&&story){
+
+  Stories.doc(storytitle).set({
+    Title:storytitle.trim().toLowerCase(),
+    AuthorName:authorname.trim().toLowerCase(),
+    TheStory:story.toLowerCase()
+  
+  })
+  ToastAndroid.showWithGravity(
+  'Your story has been submitted!',
+  ToastAndroid.SHORT,
+  ToastAndroid.CENTER
+  )
+
+}
+else{
+  ToastAndroid.showWithGravity(
+    'Please fill in the respective text boxes ',
+    ToastAndroid.LONG,
+    ToastAndroid.CENTER
+    )
+}
+
+this.setState({storyTitle:"",authorName:"",Story:""})
+
+    }
     render(){
       return (
         <View style={styles.container}>
@@ -21,21 +54,28 @@ export default class WriteStoryScreen extends React.Component{
       centerComponent={{text:'Story Hub',style:{color:'#000000',fontSize:25,fontWeight:'bold',alignSelf:'center'}}}
     
       />
+      <KeyboardAvoidingView  
+      style={styles.container}>
 
           <TextInput placeholder="Story Title" onChangeText={(text)=>{this.setState({storyTitle:text})}} value={this.state.storyTitle} style={styles.inputBox}/>
 
-          <TextInput placeholder="Author Name"  onChangeText={(text)=>{this.setState({authorName:text})}} style={styles.inputBox}/>
+          <TextInput placeholder="Author Name"  onChangeText={(text)=>{this.setState({authorName:text})}} value={this.state.authorName}  style={styles.inputBox}/>
 
-          <TextInput placeholder="Write your story here"  onChangeText={(text)=>{this.setState({Story:text})}} style={styles.StoryBox}/>
+          <TextInput placeholder="Write your story here"  onChangeText={(text)=>{this.setState({Story:text})}} value={this.state.Story} style={styles.StoryBox} multiline={true}/>
 
-          <TouchableOpacity style={styles.goButton}><Text style={styles.buttonText}>SUBMIT</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.goButton} onPress={()=>{this.submitStory()}}><Text style={styles.buttonText}>SUBMIT</Text></TouchableOpacity>
+          </KeyboardAvoidingView>
         </View>
       );
     }
     
   }
   const styles = StyleSheet.create({
- 
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    
+    },
     inputBox:{
       marginTop:50,
       width:300,
