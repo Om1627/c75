@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View,Image,ScrollView } from 'react-native';
+import { StyleSheet, Text, View,Image,ScrollView,TextInput,TouchableOpacity } from 'react-native';
 import {SearchBar} from 'react-native-elements'
 import {createAppContainer} from 'react-navigation'
 import {createBottomTabNavigator} from 'react-navigation-tabs'
@@ -57,16 +57,14 @@ this.state.allStories.map((data,index)=>{
       })
     
     }
+    
   }
   console.log(this.state.dataSource)
   
 })
+
   }
-showStories=async()=>{
-  if (this.state.search===''){
-    
-  }
-}
+
   componentDidMount(){
     this.retrieveStories()
    
@@ -77,13 +75,17 @@ showStories=async()=>{
       return (
         <View style={styles.container}>
 
-          <View>
-          <SearchBar style={styles.searchbar} onChangeText={(text)=>{
-           this.searchFilter()
+          <View style={{flexDirection:"row"}}>
+          <TextInput style={styles.searchbar} placeholder='Search' onChangeText={(text)=>{
+         
            this.setState({search:text})
          }}
          value={this.state.search}
-         ></SearchBar>
+         ></TextInput>
+         <TouchableOpacity style={styles.searchButton} onPress={()=>{this.searchFilter()}}>
+<Text style={styles.buttonText}>Search</Text>
+
+         </TouchableOpacity>
 
           </View>
 <ScrollView>
@@ -124,15 +126,38 @@ showStories=async()=>{
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#fff',
+      backgroundColor: 'grey',
     
     },
     searchbar:{
-      width:100,
-      marginTop:30
+      marginTop:50,
+      width:'90%',
+      alignSelf:'flex-start',
+      height:40,
+      textAlign:'center',
+      borderWidth:6,
+      flexDirection:"row",
+      backgroundColor:'lightgrey',
+      
     },
     storytext:{
       backgroundColor:'pink',
       marginTop:50
-    }
+    },
+    searchButton:{
+      width:'10%',
+      height:40,
+      alignSelf:'flex-end',
+      padding:10,
+      alignItems:'center',
+      flexDirection:"row",
+      backgroundColor:'orange'
+  
+    },
+    buttonText:{
+      textAlign:'center',
+      fontSize:30,
+      fontWeight:'bold'
+      
+    },
   });
