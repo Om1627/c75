@@ -2,8 +2,7 @@ import * as firebase from 'firebase'
 require('@firebase/firestore')
 
 var firebaseConfig = {
-  
-    apiKey: "AIzaSyAnkE26LVtIApwqUWNpNzc8Zn1VttwZXsg",
+      apiKey: "AIzaSyAnkE26LVtIApwqUWNpNzc8Zn1VttwZXsg",
     authDomain: "storyhub2-3f612.firebaseapp.com",
     databaseURL: "https://storyhub2-3f612.firebaseio.com",
     projectId: "storyhub2-3f612",

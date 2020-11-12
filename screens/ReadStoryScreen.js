@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View,Image,ScrollView,TextInput,TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View,Image,ScrollView,TextInput,TouchableOpacity,FlatList } from 'react-native';
 import {SearchBar} from 'react-native-elements'
 import {createAppContainer} from 'react-navigation'
 import {createBottomTabNavigator} from 'react-navigation-tabs'
@@ -12,14 +12,16 @@ export default class ReadStoryScreen extends React.Component{
     this.state={
 search:'',
 allStories:[],
-dataSource:[]
+dataSource:[],
+lastVisibleStory:null
     }
   }
   retrieveStories=async()=>{
-const query= await  db.collection('Stories').limit(10).get()
+const query= await  db.collection('Stories').limit(100).get()
 query.docs.map((doc)=>{
   this.setState({
-    allStories:[...this.state.allStories,doc.data()]
+    allStories:[...this.state.allStories,doc.data()],
+    lastVisibleStory:doc
   })
 // console.log(this.state.allStories)
 })
@@ -40,7 +42,8 @@ this.state.allStories.map((data,index)=>{
     if(query!==undefined){
       query.docs.map((doc)=>{
         this.setState({
-          dataSource:[doc.data()]
+          dataSource:[doc.data()],
+          lastVisibleStory:doc
         })
       })
        
@@ -52,18 +55,58 @@ this.state.allStories.map((data,index)=>{
      if(query2!==undefined){
       query2.docs.map((doc)=>{
         this.setState({
-          dataSource:[doc.data()]
+          dataSource:[doc.data()],
+          lastVisibleStory:doc
         })
       })
     
     }
     
   }
-  console.log(this.state.dataSource)
+  console.log(this.state.lastVisibleStory)
   
 })
 
   }
+  fetchMoreStories=async()=>{
+    var text=this.state.search
+    var enteredText=text.trim().toLowerCase()
+    const query=  await db.collection('Stories').where("AuthorName","==",enteredText).startAfter(this.state.lastVisibleStory).limit(10).get()
+    const query2=  await db.collection('Stories').where("Title","==",enteredText).startAfter(this.state.lastVisibleStory).limit(10).get()
+    
+    this.state.allStories.map((data,index)=>{
+      if (enteredText===this.state.allStories[index].AuthorName){
+      
+        
+        if(query!==undefined){
+          query.docs.map((doc)=>{
+            this.setState({
+              dataSource:[doc.data()],
+              lastVisibleStory:doc
+            })
+          })
+           
+        }
+       
+      }
+      else if(enteredText===this.state.allStories[index].Title){
+       
+         if(query2!==undefined){
+          query2.docs.map((doc)=>{
+            this.setState({
+              dataSource:[doc.data()],
+              lastVisibleStory:doc
+            })
+          })
+        
+        }
+        
+      }
+      console.log(this.state.dataSource)
+      
+    })
+    
+      }
 
   componentDidMount(){
     this.retrieveStories()
@@ -91,29 +134,29 @@ this.state.allStories.map((data,index)=>{
 <ScrollView>
      <View>
 
-  {
-    this.state.allStories.map((items,index)=>{
-
-      return(
+     <FlatList
+                data={this.state.search === "" ?  this.state.allStories: this.state.dataSource}
+                renderItem={({ item }) => (
+                  <View style={{backgroundColor:'cyan'}}>
  
-        <View style={{backgroundColor:'cyan'}}>
- 
- <Text style={{fontSize:25,fontWeight:'bold',marginTop:50,alignSelf:'center'}}>
-   {this.state.allStories[index].Title.toUpperCase()}
- </Text>
- 
- <Text style={styles.storytext}>
- Story Title:  {this.state.allStories[index].Title.toUpperCase()}
- </Text>
- 
- <Text style={{backgroundColor:'pink'}}>
-  Author Name: {this.state.allStories[index].AuthorName.toUpperCase()}
- </Text>
- 
- </View>
-    )
-   })
-  } 
+                  <Text style={{fontSize:25,fontWeight:'bold',marginTop:50,alignSelf:'center'}}>
+                    {item.Title.toUpperCase()}
+                  </Text>
+                  
+                  <Text style={styles.storytext}>
+                  Story Title:  {item.Title.toUpperCase()}
+                  </Text>
+                  
+                  <Text style={{backgroundColor:'pink'}}>
+                   Author Name: {item.AuthorName.toUpperCase()}
+                  </Text>
+                  
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+                onEndReached={this.fetchMoreStories()}
+                onEndReachedThreshold={0.7}
+                /> 
   
 
      </View>
@@ -145,7 +188,7 @@ this.state.allStories.map((data,index)=>{
       marginTop:50
     },
     searchButton:{
-      width:'10%',
+      width:80,
       height:40,
       alignSelf:'flex-end',
       padding:10,
@@ -156,7 +199,7 @@ this.state.allStories.map((data,index)=>{
     },
     buttonText:{
       textAlign:'center',
-      fontSize:30,
+      fontSize:10,
       fontWeight:'bold'
       
     },
