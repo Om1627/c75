@@ -177,8 +177,12 @@ export default class WelcomeScreen extends React.Component {
           <Text style={{color:'#ff8a65'}}> An App for all the creative writers out there </Text>
         </View>
 {this.showModal()}
+<View>
+            <Image source={require('../assets/images.jpg')} style={{alignSelf:'center'}}/>
+            </View>
         <View style={styles.loginBox}>
-        
+            
+     
        
             <TextInput
             style={styles.formTextInput}
